@@ -22,6 +22,7 @@ Options:
 """
 
 import os
+import psutil
 import sys
 from docopt import docopt
 import logging
@@ -235,7 +236,16 @@ def run(dc01_port: str, args) -> None:
         time.sleep(WHILE_PERIOD)
 
 
+def set_high_process_priority() -> None:
+    p = psutil.Process(os.getpid())
+    if os.name == 'nt':
+        p.nice(psutil.HIGH_PRIORITY_CLASS)
+    else:
+        p.nice(10)
+
+
 def main() -> None:
+    set_high_process_priority()
     args = docopt(__doc__, version=APP_VERSION)
 
     logformat = '[%(asctime)s] %(levelname)s %(message)s'
